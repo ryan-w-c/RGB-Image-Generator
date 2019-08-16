@@ -1,0 +1,290 @@
+#:import FadeTransition kivy.uix.screenmanager.FadeTransition
+#:import F kivy.factory.Factory
+
+<CustomButton@Button>:
+    font_size: 32
+    size: 100, 50
+    background_normal: ''
+    background_color: .15, .15, .15, .6
+    size_hint: .4, .3
+
+<DarkButton@Button>:
+    background_normal: ''
+    background_color: .15, .15, .15, .6
+    font_size: 20
+
+<ClearButton@Button>:
+    background_normal: ''
+    background_color: .3, .3, .32, 1
+
+<DarkTogOrientation@ToggleButton>:
+    background_normal: ''
+    background_color: .15, .15, .15, .6
+    font_size: 20
+    on_state: app.root.on_state_orientation(self.state, self.text)
+
+<DarkTogRatio@ToggleButton>:
+    background_normal: ''
+    background_color: .15, .15, .15, .6
+    font_size: 20
+    on_state: app.root.on_state_ratio(self.state, self.text)
+
+<DarkTogDelete@ToggleButton>:
+    background_normal: ''
+    background_color: .15, .15, .15, .6
+    font_size: 20
+    on_state: app.root.on_state_delete(self.state, self.text)
+
+<LinkButton@Button>:
+    font_size: 32
+    background_normal: ''
+    background_color: .15, .15, .15, .6
+    size_hint: .2, .15
+
+<WhiteButton@Button>:
+    font_size: 32
+    background_normal: ''
+    background_color: 1, 1, 1, 1
+
+<ResizedLabel@Label>:
+    text_size: root.width, None
+    size: self.texture_size
+
+<DupsPopup@Popup>:
+    id: dups
+    title: 'Delete Duplicate Color Information'
+    size_hint: .6, .6
+    DarkButton:
+        on_release: dups.dismiss()
+        text: 'Some pictures have a lot of the\nsame color. By enabling Delete Duplicate\nColors, if any same RGB values are\nin a row, those values will be\nreduced to 1 RGB value. For example,\nan image that contains 400 black values\nin a row, is reduced to only one\nvalue of black. This is recommended.'
+        halign: 'center'
+
+<WorksPopup@Popup>:
+    id: works
+    title: 'How it Works'
+    size_hint: .6, .6
+    DarkButton:
+        on_release: works.dismiss()
+        text: 'This program works by reading a\nuser selected image and storing every\nRGB value from that image. If the image\nis too large it will be resized\nto a smaller version.  The program\ncreates a new one pixel length image\nusing the stored RGB values, then\nstretches the image to the\ndesired output ratio.'
+        halign: 'center'
+
+<SaveInfoPopup@Popup>:
+    id: saveinfo
+    title: 'How it Works'
+    size_hint: .6, .6
+    DarkButton:
+        on_release:
+            saveinfo.dismiss()
+        text: 'This image will be saved in the\nsame location as the source image.\nIt will override any png file\nwith the same name.'
+        halign: 'center'
+
+<DarkFloat@FloatLayout>
+    canvas.before:
+        Color:
+            rgb: .3, .3, .32, 1
+        Rectangle:
+            size: self.size
+
+<MyScreenManager>:
+    id: sm
+    transition: FadeTransition()
+    saveinputtext: saveText.text
+
+    Screen:
+        name: 'intro'
+        DarkFloat:
+            CustomButton:
+                text: "Start"
+                pos_hint:{"center_x": .75, "center_y": .21}
+                on_release: sm.current = 'RGB'
+            CustomButton:
+                text: "About"
+                pos_hint:{"center_x": .25, "center_y": .21}
+                on_release: sm.current = 'about'
+            ResizedLabel:
+                text: 'This program creates a graphic from a\nuser selected image. The created graphic\nis composed of vertical or horizontal lines\nusing RGB values from the selected image.'
+                font_size: 32
+                halign: 'center'
+                pos_hint:{"center_x": .5, "center_y": .7}
+
+    Screen:
+        name: "about"
+        DarkFloat:
+            CustomButton:
+                text: "Back"
+                pos_hint:{"center_x": .5, "center_y": .05}
+                on_release: sm.current = 'intro'
+                size_hint: .15, .1
+            Label:
+                text: 'Created by: Ryan Cavanagh\n\nWritten in Python\n\nUsing Kivy and PIL'
+                font_size: 32
+                text_size: root.width, None
+                size: self.texture_size
+                halign: 'center'
+                pos_hint:{"center_x": .5, "center_y": .725}
+            LinkButton:
+                text: 'Website'
+                pos_hint:{"center_x": .35, "center_y": .25}
+                on_press: root.openWebsite()
+            LinkButton:
+                text: 'Github'
+                pos_hint:{"center_x": .65, "center_y": .25}
+                on_press: root.openGitHub()
+            DarkButton:
+                text: 'How it Works'
+                halign: 'center'
+                font_size: 32
+                size_hint: .3, .15
+                pos_hint: {"center_x": .5, "center_y": .44}
+                on_release: F.WorksPopup().open()
+
+
+    Screen:
+        name: 'RGB'
+        DarkFloat:
+            WhiteButton:
+                size_hint: .35, .35
+                pos_hint: {"center_x": .19, "center_y": .8}
+            WhiteButton:
+                size_hint: .35, .35
+                pos_hint: {"center_x": .81, "center_y": .8}
+            Image:
+                id: userImageDrop
+                size_hint: .3, .3
+                pos_hint: {"center_x": .19, "center_y": .8}
+            Image:
+                id: previewImage
+                size_hint: .3, .3
+                pos_hint: {"center_x": .81, "center_y": .8}
+            Label:
+                text: 'Drag & Drop Image'
+                font_size: 20
+                pos_hint: {"center_x": .5, "center_y": .8}
+            DarkButton:
+                text: "Back"
+                pos_hint:{"center_x": .5, "center_y": .05}
+                on_release: sm.current = 'intro'
+                size_hint: .15, .1
+            Label:
+                text: 'Output:'
+                font_size: 20
+                pos_hint: {"center_x": .275, "center_y": .2}
+            Label:
+                text: 'Ratio:'
+                font_size: 20
+                pos_hint: {"center_x": .125, "center_y": .5}
+            DarkTogOrientation:
+                text: 'Vertical'
+                group: 'g2'
+                size_hint: .15, .1
+                pos_hint: {"center_x": .425, "center_y": .2}
+            DarkTogOrientation:
+                text: 'Horizontal'
+                group: 'g2'
+                size_hint: .15, .1
+                pos_hint: {"center_x": .575, "center_y": .2}
+            DarkTogRatio:
+                text: '21:9'
+                group: 'g3'
+                size_hint: .09, .1
+                pos_hint: {"center_x": .23, "center_y": .5}
+            DarkTogRatio:
+                text: '16:9'
+                group: 'g3'
+                size_hint: .09, .1
+                pos_hint: {"center_x": .32, "center_y": .5}
+            DarkTogRatio:
+                text: '4:3'
+                group: 'g3'
+                size_hint: .09, .1
+                pos_hint: {"center_x": .41, "center_y": .5}
+            DarkTogRatio:
+                text: '1:1'
+                group: 'g3'
+                size_hint: .09, .1
+                pos_hint: {"center_x": .5, "center_y": .5}
+            DarkTogRatio:
+                text: '3:4'
+                group: 'g3'
+                size_hint: .09, .1
+                pos_hint: {"center_x": .59, "center_y": .5}
+            DarkTogRatio:
+                text: '9:16'
+                group: 'g3'
+                size_hint: .09, .1
+                pos_hint: {"center_x": .68, "center_y": .5}
+            DarkTogRatio:
+                text: '9:21'
+                group: 'g3'
+                size_hint: .09, .1
+                pos_hint: {"center_x": .77, "center_y": .5}
+            ClearButton:
+                text: 'Delete Duplicate Colors: \nClick for More Info'
+                halign: 'center'
+                font_size: 20
+                size_hint: .3, .1
+                pos_hint: {"center_x": .225, "center_y": .35}
+                on_release: F.DupsPopup().open()
+            DarkTogDelete:
+                text: 'Yes'
+                group: 'g4'
+                size_hint: .1, .1
+                pos_hint: {"center_x": .45, "center_y": .35}
+            DarkTogDelete:
+                text: 'No'
+                group: 'g4'
+                size_hint: .1, .1
+                pos_hint: {"center_x": .55, "center_y": .35}
+            DarkButton:
+                text: 'Refresh Preview'
+                size_hint: .25, .125
+                pos_hint: {"center_x": .15, "center_y": .085}
+                on_release: root.process()
+            DarkButton:
+                id: saveButton
+                text: 'Save'
+                disabled: True
+                size_hint: .25, .125
+                pos_hint: {"center_x": .85, "center_y": .085}
+                on_release: sm.current = 'save'
+
+    Screen:
+        name: 'save'
+        DarkFloat:
+            Label:
+                text: 'Save as:'
+                font_size: 20
+                pos_hint: {"center_x": .1, "center_y": .3}
+            TextInput:
+                id: saveText
+                size_hint: (.775, None)
+                height: 35
+                multiline: False
+                font_size: 20
+                pos_hint:{"center_x": .55, "center_y": .3}
+                on_text:
+                    app.processText()
+            DarkButton:
+                text: 'Save'
+                size_hint: .25, .125
+                pos_hint: {"center_x": .85, "center_y": .085}
+                on_release:
+                    root.saveImage()
+            WhiteButton:
+                size_hint: .6, .6
+                pos_hint: {"center_x": .5, "center_y": .675}
+            Image:
+                id: savePreview
+                size_hint: .5, .5
+                pos_hint: {"center_x": .5, "center_y": .675}
+            DarkButton:
+                text: "Back"
+                pos_hint:{"center_x": .5, "center_y": .05}
+                on_release: sm.current = 'RGB'
+                size_hint: .15, .1
+            DarkButton:
+                text: 'Important Save Information'
+                halign: 'center'
+                size_hint: .4, .1
+                pos_hint: {"center_x": .5, "center_y": .2}
+                on_release: F.SaveInfoPopup().open()
